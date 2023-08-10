@@ -1,0 +1,373 @@
+openapi: 3.0.0
+info:
+  title: Policyholder
+  description: |-
+    This API is designed to show how you might mock, test document a new API. In this case, we're assuming that we're going to create a basic user management API.
+
+    It has basic CRUD operations listed below.
+
+    Hit the "Run in Postman" button to see the pre-request and test scripts powering this collection.
+
+    Try running the collection through the Collection Runner to see how the mock allows us to scope out all our responses and write our tests in advance.
+
+    ## Summary
+
+    Having undergone the effort of building out our collection in Postman first:
+
+    - Using Postman Mocks
+    - Writing tests
+     
+    This has allowed us to then build out our API to match, meaning we could:
+    (Update the `url` in the environment to `http://localhost:3000` and run the following Node API: https://github.com/matt-ball/users-api)
+
+    - Debug our API as it was being built
+    - Ensure parity with our mocks, meeting the designed blueprint
+    - Run tests against the API as it was being built so that it's watertight
+
+    As a result:
+
+    - We now have a shareable collection for our API
+    - We have beautiful, rich documentation showing how it works
+    - We can run our collection in a fully automated fashion and attach it to our CI/CD pipeline
+    - We can create a Postman Monitor with no added effort to check for responsiveness and correctness
+  contact: {}
+  version: 3.0.1
+security:
+  - basicAuth: []
+servers:
+  - url: https://api.insurance.com
+    description: Production server
+paths:
+  /policyholder:
+    post:
+      tags:
+        - Create
+      summary: Create new policyholder
+      description: Creates a new user in the system. The user will be assigned an ID automatically. This can be found in the response.
+      operationId: NewUser
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - firstName
+                - lastName
+                - password
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  description: The user's first name (required)
+                  example: Ben
+                lastName:
+                  type: string
+                  description: The user's last name (required)
+                  example: Smith
+                password:
+                  type: string
+                  description: The user's password (required)
+                  example: pw
+        required: false
+      responses:
+        "201":
+          description: ""
+          headers: {}
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: "#/components/schemas/Newuser"
+              examples:
+                201 New User Created:
+                  value:
+                    status: success
+                    firstName: Ben
+                    lastName: Smith
+                    id: 0729d37c-ef9f-4ffa-8f71-a6eedf1f95b7
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Newuser%28failure%29"
+              examples:
+                400 Bad Request:
+                  value:
+                    status: "Error creating new user, check document for proper payload"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Generic500"
+              examples:
+                500 Internal Server Error:
+                  value:
+                    error: There was an error with your call. Try later or contact support
+      deprecated: false
+    parameters: []
+    get:
+      summary: Get all policyholders
+      operationId: GetAllUsers
+      responses:
+        "200":
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Getalluser"
+              examples:
+                200 OK:
+                  value:
+                    - firstName: updated
+                      lastName: Abbott
+                      id: UK1955
+                    - firstName: Florian
+                      lastName: Monteiro
+                      id: DACH2000
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Generic500"
+              examples:
+                500 Internal Server Error:
+                  value:
+                    error: There was an error with your call. Try later or contact support
+      description: Get all users in the system.
+  "/policyholder/{id}":
+    get:
+      summary: Get single policyholder
+      tags: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Getusersbyfirstname"
+              examples:
+                200 Get User:
+                  value:
+                    firstName: Bennny
+                    lastName: Jones
+                    id: bf243c80-fc6c-4686-9a49-cdc8bd1c1e5f
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetuserbyID(nouserfound)"
+              examples:
+                404 Not Found:
+                  value:
+                    status: no user found
+                    id: 0729d37c-ef9f-4ffa-8f71-a6eedf1f95b
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Generic500"
+              examples:
+                500 Internal Server Error:
+                  value:
+                    error: There was an error with your call. Try later or contact support
+      operationId: getSingleUser
+      description: Gets the info of a single user
+    parameters:
+      - schema:
+          type: string
+          example: UK2003
+          default: ID0001
+        name: id
+        required: true
+        in: path
+    patch:
+      summary: Update a policyholder
+      operationId: updateUser
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Getalluser"
+              examples:
+                200 User Updated:
+                  value:
+                    firstName: Bennny
+                    lastName: Jones
+                    id: bf243c80-fc6c-4686-9a49-cdc8bd1c1e5f
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetuserbyID(nouserfound)"
+              examples:
+                404 Not Found:
+                  value:
+                    status: no user found
+                    id: 0729d37c-ef9f-4ffa-8f71-a6eedf1f95b
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Generic500"
+              examples:
+                500 Internal Server Error:
+                  value:
+                    error: There was an error with your call. Try later or contact support
+      description: Updates any details from user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                password:
+                  type: string
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    Newuser:
+      title: Newuser
+      required:
+        - status
+        - firstName
+        - lastName
+        - id
+      type: object
+      properties:
+        status:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        id:
+          type: string
+      example:
+        status: success
+        firstName: Ben
+        lastName: Smith
+        id: 0729d37c-ef9f-4ffa-8f71-a6eedf1f95b7
+    Newuser(failure):
+      title: Newuser(failure)
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          type: string
+      example:
+        status: fail
+    Getalluser:
+      title: Getalluser
+      type: object
+      properties:
+        status:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        id:
+          type: string
+      example:
+        status: success
+      x-examples: {}
+    GetuserbyID(nouserfound):
+      title: GetuserbyID(nouserfound)
+      required:
+        - status
+        - id
+      type: object
+      properties:
+        status:
+          type: string
+        id:
+          type: string
+      example:
+        status: no user found
+        id: 0729d37c-ef9f-4ffa-8f71-a6eedf1f95b
+    Getusersbyfirstname:
+      title: Getusersbyfirstname
+      type: object
+      properties:
+        status:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        id:
+          type: string
+      example:
+        status: success
+    Updateuser:
+      title: Updateuser
+      required:
+        - status
+        - firstName
+        - lastName
+        - id
+      type: object
+      properties:
+        status:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        id:
+          type: string
+      example:
+        status: success
+        firstName: Benjamin
+        lastName: Smith
+        id: 0729d37c-ef9f-4ffa-8f71-a6eedf1f95b7
+    Deleteuser:
+      title: Deleteuser
+      required:
+        - status
+        - id
+      type: object
+      properties:
+        status:
+          type: string
+        id:
+          type: string
+      example:
+        status: success
+        id: 0729d37c-ef9f-4ffa-8f71-a6eedf1f95b7
+    Generic500:
+      title: Generic500
+      x-stoplight:
+        id: qxcam86zrzhyk
+      type: object
+      description: Generic 500 error
+      x-examples:
+        500 Error:
+          error: There was an error with your call. Try later or contact support
+      properties:
+        error:
+          type: string
+tags:
+  - name: Create
+  - name: Read
+  - name: Update
+  - name: Delete
